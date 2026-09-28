@@ -1,0 +1,35 @@
+# End-to-end test of the released momus action on a large PR: the PR adds
+# all of OWASP Juice Shop (1618a611b) to this otherwise empty repository.
+name: momus
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: momus-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: brianluby/momus-review@v0.1.0
+        with:
+          api-key: ${{ secrets.TYPESAFE_API_KEY }}
+          version: v0.1.0
+          # The same vendored-asset excludes as the README benchmark.
+          exclude: |
+            frontend/src/assets/**
+            data/static/codefixes/**
+            data/static/contractABIs.ts
