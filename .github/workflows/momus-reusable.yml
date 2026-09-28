@@ -1,0 +1,17 @@
+# Integration test: the reusable workflow from a momus-review branch.
+name: momus (reusable)
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    uses: brianluby/momus-review/.github/workflows/review.yml@feat/rollout
+    secrets:
+      TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+    with:
+      fail-on-blocking: false
